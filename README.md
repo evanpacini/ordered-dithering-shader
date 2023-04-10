@@ -1,6 +1,6 @@
 # Ordered Dithering Shader
 
-Some minecraft ordered dithering shaders I made.
+Some minecraft ordered dithering shaders I made. Note that they are OptiFine / Iris shaders, not vanilla shaders.
 
 ## How to use
 
