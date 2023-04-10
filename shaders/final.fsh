@@ -10,7 +10,7 @@ const mat4 bayerIndex = mat4(
 );
 
 // Inputs
-in vec2 texcoord;
+in vec4 texcoord;
 uniform sampler2D gcolor;
 
 // Outputs
