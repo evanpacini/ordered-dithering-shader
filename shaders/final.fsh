@@ -4,43 +4,36 @@
 const vec3 grayscaleFactor = vec3(0.2126, 0.7152, 0.0722);
 const vec3 referenceWhite = vec3(95.047, 100.000, 108.883);
 
-const mat4 bayerIndex = mat4(
-vec4(0.0/16.0, 12.0/16.0, 3.0/16.0, 15.0/16.0),
-vec4(8.0/16.0, 4.0/16.0, 11.0/16.0, 7.0/16.0),
-vec4(2.0/16.0, 14.0/16.0, 1.0/16.0, 13.0/16.0),
-vec4(10.0/16.0, 6.0/16.0, 9.0/16.0, 5.0/16.0)
-);
-
 const mat3 XYZ = mat3(
-vec3(0.4124, 0.3576, 0.1805),
-vec3(0.2126, 0.7152, 0.0722),
-vec3(0.0193, 0.1192, 0.9505)
+    vec3(0.4124, 0.3576, 0.1805),
+    vec3(0.2126, 0.7152, 0.0722),
+    vec3(0.0193, 0.1192, 0.9505)
 );
 
 const vec3 palette[] = vec3[](
-vec3(0.820, 0.694, 0.529),
-vec3(0.780, 0.482, 0.345),
-vec3(0.682, 0.365, 0.251),
-vec3(0.475, 0.267, 0.29),
-vec3(0.294, 0.239, 0.267),
-vec3(0.729, 0.569, 0.345),
-vec3(0.573, 0.455, 0.255),
-vec3(0.302, 0.271, 0.224),
-vec3(0.467, 0.455, 0.231),
-vec3(0.702, 0.647, 0.333),
-vec3(0.824, 0.788, 0.647),
-vec3(0.549, 0.671, 0.631),
-vec3(0.294, 0.447, 0.431),
-vec3(0.341, 0.282, 0.322),
-vec3(0.518, 0.471, 0.459),
-vec3(0.671, 0.608, 0.557)
+    vec3(0.820, 0.694, 0.529),
+    vec3(0.780, 0.482, 0.345),
+    vec3(0.682, 0.365, 0.251),
+    vec3(0.475, 0.267, 0.29),
+    vec3(0.294, 0.239, 0.267),
+    vec3(0.729, 0.569, 0.345),
+    vec3(0.573, 0.455, 0.255),
+    vec3(0.302, 0.271, 0.224),
+    vec3(0.467, 0.455, 0.231),
+    vec3(0.702, 0.647, 0.333),
+    vec3(0.824, 0.788, 0.647),
+    vec3(0.549, 0.671, 0.631),
+    vec3(0.294, 0.447, 0.431),
+    vec3(0.341, 0.282, 0.322),
+    vec3(0.518, 0.471, 0.459),
+    vec3(0.671, 0.608, 0.557)
 );
-
 const float numberOfColors = float(palette.length());
 
 // Inputs
 in vec4 texcoord;
 uniform sampler2D gcolor;
+uniform sampler2D colortex15;
 
 // Outputs
 out vec4 fragcolor;
@@ -160,10 +153,10 @@ float CIEDE2000(vec3 lab1, vec3 lab2) {
     float Rt = -Rc * sin(2.0 * 30.0 * exp(-((Hp - 275.0) / 25.0) * ((Hp - 275.0) / 25.0)));
 
     return sqrt(
-    pow((lab2.x - lab1.x) / Sl, 2.0) +
-    pow((C2p - C1p) / Sc, 2.0) +
-    pow(dHp / Sh, 2.0) +
-    Rt * (C2p - C1p) / Sc * dHp / Sh
+        pow((lab2.x - lab1.x) / Sl, 2.0) +
+        pow((C2p - C1p) / Sc, 2.0) +
+        pow(dHp / Sh, 2.0) +
+        Rt * (C2p - C1p) / Sc * dHp / Sh
     );
 }
 
@@ -175,8 +168,8 @@ void main() {
     color = sRGBToLinear(color);
 
     // Dither color
-    float bayerValue = bayerIndex[int(gl_FragCoord.x) & 0x3][int(gl_FragCoord.y) & 0x3];
-    color += (bayerValue - 0.5) / log2(numberOfColors);
+    float dither = texture2D(colortex15, gl_FragCoord.xy / 1024).r;
+    color += (dither - 0.5) / log2(numberOfColors);
 
     // Convert color to Lab
     color = linearRGBToLab(color);
