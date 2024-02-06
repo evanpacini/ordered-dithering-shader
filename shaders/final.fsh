@@ -1,4 +1,4 @@
-#version 450 compatibility
+#version 460 compatibility
 
 // Constants
 const vec3 grayscaleFactor = vec3(0.2126, 0.7152, 0.0722);
@@ -94,7 +94,7 @@ vec3 linearRGBToLab(vec3 rgb) {
 }
 
 vec3 LabTolinearRGB(vec3 lab) {
-    return XYZTolinearRGB(LabToXYZ(lab));
+    return XYZToLinearRGB(LabToXYZ(lab));
 }
 
 vec3 sRGBToLab(vec3 srgb) {
