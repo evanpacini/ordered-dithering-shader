@@ -1,0 +1,14 @@
+option.GAMMA=Gamma correction
+option.GAMMA.comment=Gamma correction to apply to the image. Lower values will make the image brighter, higher values will make it darker.
+value.GAMMA.1.0=None
+
+option.DITHER_FACTOR=Dither factor
+option.DITHER_FACTOR.comment=Amount of dithering to apply. More dithering will make the image look more like the original, but may introduce noise.
+value.DITHER_FACTOR.0.0=No dithering
+
+option.DITHER_METHOD=Dithering method
+value.DITHER_METHOD.0=Bayer 4x4
+value.DITHER_METHOD.1=Blue noise 1024x1024
+
+option.DITHER_COLOR=Dither color
+option.DITHER_COLOR.comment=Uses a color palette when on, otherwise dithers to monochrome.
