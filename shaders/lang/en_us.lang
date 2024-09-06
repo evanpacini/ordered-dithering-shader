@@ -6,9 +6,19 @@ option.DITHER_FACTOR=Dither factor
 option.DITHER_FACTOR.comment=Amount of dithering to apply. More dithering will make the image look more like the original, but may introduce noise.
 value.DITHER_FACTOR.0.0=No dithering
 
-option.DITHER_METHOD=Dithering method
+option.DITHER_METHOD=Dither method
 value.DITHER_METHOD.0=Bayer 4x4
 value.DITHER_METHOD.1=Blue noise 1024x1024
 
 option.DITHER_COLOR=Dither color
 option.DITHER_COLOR.comment=Uses a color palette when on, otherwise dithers to monochrome.
+
+option.DITHER_CMAP=Color palette
+option.DITHER_CMAP.comment=Color palette to use when dithering to color.
+value.DITHER_CMAP.0=Color palette 0
+value.DITHER_CMAP.1=Color palette 1
+value.DITHER_CMAP.2=Color palette 2
+value.DITHER_CMAP.3=Color palette 3
+value.DITHER_CMAP.4=Color palette 4
+value.DITHER_CMAP.5=Color palette 5
+value.DITHER_CMAP.6=Color palette 6

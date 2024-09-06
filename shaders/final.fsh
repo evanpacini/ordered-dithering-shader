@@ -1,8 +1,9 @@
 #version 460 compatibility
 
 #define GAMMA 1.0 // Gamma correction [0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0 2.2]
-#define DITHER_FACTOR 0.25 // Amount of dithering to apply [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define DITHER_FACTOR 0.5 // Amount of dithering to apply [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 #define DITHER_METHOD 0 // Dithering method [0 1]
+#define DITHER_CMAP 0 // Dither color palette [0 1 2 3 4 5 6]
 #define DITHER_BAYER4X4 0
 #define DITHER_BLUENOISE1024X1024 1
 #define DITHER_COLOR // Dither color
@@ -22,8 +23,12 @@ const vec3 grayscaleFactor = vec3(0.2126, 0.7152, 0.0722);
 
 in vec2 texcoord;
 uniform sampler2D colortex0;
+#if DITHER_METHOD == DITHER_BLUENOISE1024X1024
 uniform sampler2D colortex8;
+#endif
+#ifdef DITHER_COLOR
 uniform sampler2D colortex9;
+#endif
 out vec4 fragcolor;
 
 void main() {
