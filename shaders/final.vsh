@@ -1,8 +1,8 @@
 #version 460 compatibility
 
-out vec4 texcoord;
+out vec2 texcoord;
 
 void main() {
     gl_Position = ftransform();
-    texcoord = gl_MultiTexCoord0;
+    texcoord = gl_MultiTexCoord0.st;
 }
