@@ -1,27 +1,13 @@
-#version 460 compatibility
+#version 400 compatibility
 
 // Configuration
 #define GAMMA 1.0 // Gamma correction [0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0 2.2]
 #define DITHER_FACTOR 0.5 // Amount of dithering to apply [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 #define DITHER_METHOD 21 // Dithering method [0 1 2 3 10 11 12 13 14 15 16 20 21]
-#define DITHER_COLORMAP 2 // Dither color palette [0 1 2 3 4 5 6 7]
+#define DITHER_COLORMAP 1 // Dither color palette [0 1 2 3 4 5 6 7]
 #define DITHER_COLOR // Dither color
-
-// Dithering methods
-// Bayer
-#define DITHER_BAYER2 0
-#define DITHER_BAYER4 1
-#define DITHER_BAYER8 2
-#define DITHER_BAYER16 3
-
-// Blue noise
-#define DITHER_BLUENOISE16 10
-#define DITHER_BLUENOISE32 11
-#define DITHER_BLUENOISE64 12
-#define DITHER_BLUENOISE128 13
-#define DITHER_BLUENOISE256 14
-#define DITHER_BLUENOISE512 15
-#define DITHER_BLUENOISE1024 16
+#define LOD 0 // Level of detail [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15]
+const float lodf = 1.0 / (1 << LOD);
 
 // Misc
 #define DITHER_IGN 20
@@ -41,28 +27,25 @@ const float phi_2 = 1.32471796;
 const vec2 magic = vec2(1.0 / phi_2, 1.0 / (phi_2 * phi_2));
 #else
 uniform sampler2D colortex8;
-uniform int size;
 #endif
 
-in vec2 texcoord;
 uniform sampler2D colortex0;
-out vec4 fragcolor;
+const bool colortex0MipmapEnabled = true;
 
 void main() {
-    vec4 color = pow(texture(colortex0, texcoord), vec4(GAMMA));
+    vec4 color = pow(texelFetch(colortex0, ivec2(gl_FragCoord.xy * lodf), LOD), vec4(GAMMA));
     #if DITHER_METHOD == DITHER_IGN
-    vec4 dither = vec4(fract(a * fract(dot(vec2(gl_FragCoord.xy), magic)))) - .5;
+    float dither = fract(a * fract(dot(floor(gl_FragCoord.xy * lodf), magic))) - .5;
     #elif DITHER_METHOD == DITHER_R2
-    vec4 dither = vec4(fract(dot(vec2(gl_FragCoord.xy), magic))) - .5;
+    float dither = fract(dot(floor(gl_FragCoord.xy * lodf), magic)) - .5;
     #else
-    vec4 dither = texelFetch(colortex8, ivec2(gl_FragCoord.xy) % size, 0) - .5;
+    float dither = texelFetch(colortex8, ivec2(gl_FragCoord.xy * lodf) % textureSize(colortex8, 0).x, 0).r - .5;
     #endif
-    color = clamp(color + dither * DITHER_FACTOR, .0, 1.);
+    color = clamp(color + dither * DITHER_FACTOR, 0, 1);
     #ifdef DITHER_COLOR
-    ivec4 rgb = ivec4(round(color * 255.));
-    int index = (rgb.r << 16) | (rgb.g << 8) | rgb.b;
-    fragcolor = texelFetch(colortex9, ivec2(index & 4095, index >> 12), 0);
+    uint index = packUnorm4x8(color) & 0xFFFFFFu;
+    gl_FragColor = texelFetch(colortex9, ivec2(index & 4095u, index >> 12), 0);
     #else
-    fragcolor = vec4(vec3(dot(color.rgb, grayscaleFactor) > .5), 1.);
+    gl_FragColor = vec4(vec3(dot(color.rgb, grayscaleFactor) > .5), 1.);
     #endif
 }
